@@ -212,32 +212,82 @@ if ('IntersectionObserver' in window && !prefersReducedMotion) {
   codeEl.innerHTML = '';
   let shown = 0;
 
-  function typeNext() {
-    shown++;
-    const { html } = buildPartial(templateNodes, shown);
+  function render(n) {
+    const { html } = buildPartial(templateNodes, n);
     codeEl.innerHTML = html + '<span class="type-cursor" aria-hidden="true"></span>';
+  }
+
+  function typeStep() {
+    if (document.hidden) { setTimeout(typeStep, 300); return; } // pause while tab is hidden
+
+    shown++;
+    render(shown);
 
     if (shown < totalChars) {
       const justTyped = codeEl.textContent.charAt(shown - 1);
       let delay = 12 + Math.random() * 26; // natural, slightly uneven typing speed
       if (justTyped === '\n') delay += 160;   // brief pause after each line
       else if (justTyped === ',') delay += 60; // tiny pause after commas
-      setTimeout(typeNext, delay);
+      setTimeout(typeStep, delay);
     } else {
+      // Fully typed — hold for a moment so it can be read, then start deleting
       codeWindow.classList.remove('is-typing');
+      setTimeout(() => {
+        codeWindow.classList.add('is-typing');
+        deleteStep();
+      }, 2200);
+    }
+  }
+
+  function deleteStep() {
+    if (document.hidden) { setTimeout(deleteStep, 300); return; }
+
+    shown--;
+    render(shown);
+
+    if (shown > 0) {
+      setTimeout(deleteStep, 6 + Math.random() * 10); // deleting reads faster than typing
+    } else {
+      // Fully deleted — brief pause, then type it all out again
+      codeWindow.classList.remove('is-typing');
+      setTimeout(() => {
+        codeWindow.classList.add('is-typing');
+        typeStep();
+      }, 500);
     }
   }
 
   // Start once the code window's own entrance animation has settled
   setTimeout(() => {
     codeWindow.classList.add('is-typing');
-    typeNext();
+    typeStep();
   }, 550);
 })();
 
 // ============================================
-// 7. Subtle 3D tilt on project cards (mouse-follow)
+// 8. Make whole project card clickable (not just the link)
 // ============================================
+document.querySelectorAll('.project-card').forEach((card) => {
+  const link = card.querySelector('.project-link');
+  if (!link) return;
+
+  const href = link.getAttribute('href');
+  // Skip "coming soon" cards that don't have a real destination yet
+  if (!href || href === '#') return;
+
+  card.classList.add('is-clickable');
+
+  card.addEventListener('click', (e) => {
+    // Let the actual <a> handle its own click (avoid firing twice)
+    if (e.target.closest('a')) return;
+
+    if (link.getAttribute('target') === '_blank') {
+      window.open(href, '_blank', 'noopener');
+    } else {
+      window.location.href = href;
+    }
+  });
+});
 if (!prefersReducedMotion && window.matchMedia('(hover: hover)').matches) {
   document.querySelectorAll('.project-card').forEach((card) => {
     const maxTilt = 6; // degrees

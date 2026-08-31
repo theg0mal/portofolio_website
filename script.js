@@ -288,6 +288,29 @@ document.querySelectorAll('.project-card').forEach((card) => {
     }
   });
 });
+
+// ============================================
+// 9. Klik untuk membalik kartu: code window <-> foto
+// ============================================
+(function initFlipCard() {
+  const flipInner = document.getElementById('flipCardInner');
+  if (!flipInner) return;
+
+  function toggleFlip() {
+    const flipped = flipInner.classList.toggle('flipped');
+    flipInner.setAttribute('aria-pressed', String(flipped));
+  }
+
+  flipInner.setAttribute('aria-pressed', 'false');
+  flipInner.addEventListener('click', toggleFlip);
+  flipInner.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleFlip();
+    }
+  });
+})();
+
 if (!prefersReducedMotion && window.matchMedia('(hover: hover)').matches) {
   document.querySelectorAll('.project-card').forEach((card) => {
     const maxTilt = 6; // degrees

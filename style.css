@@ -301,6 +301,59 @@ a { color: inherit; text-decoration: none; }
   opacity: 0.6;
 }
 
+.flip-card {
+  position: relative;
+  z-index: 1;
+  perspective: 1600px;
+}
+
+.flip-card-inner {
+  position: relative;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 1.1s cubic-bezier(.34,1.56,.64,1);
+  aspect-ratio: 4 / 3.1;
+}
+
+.flip-card-inner.flipped {
+  transform: rotateY(900deg);
+}
+
+.flip-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius);
+}
+
+/* Beats the plain .code-window rule below via higher specificity,
+   so the front face actually overlaps the back face instead of
+   sitting in normal flow above it. */
+.flip-front.code-window {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+}
+
+.flip-back {
+  transform: rotateY(180deg);
+  overflow: hidden;
+  border: 4px solid var(--bg);
+  box-shadow: 0 20px 50px -20px rgba(0,0,0,0.5);
+}
+
+.flip-back img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .code-window {
   position: relative;
   z-index: 1;
@@ -342,6 +395,7 @@ a { color: inherit; text-decoration: none; }
   font-family: var(--font-display);
   font-size: 12px;
   color: #9AA1AC;
+  flex-shrink: 0;
 }
 
 .code-block {
@@ -351,7 +405,9 @@ a { color: inherit; text-decoration: none; }
   font-size: 14px;
   line-height: 1.9;
   color: #E6E8EB;
-  overflow-x: auto;
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .c-key { color: #C792EA; }
@@ -459,7 +515,7 @@ a { color: inherit; text-decoration: none; }
 .scroll-cue {
   position: absolute;
   left: 24px;
-  bottom: -28px;
+  bottom: -44px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -513,7 +569,7 @@ a { color: inherit; text-decoration: none; }
 .hero-text {
   display: flex;
   align-items: flex-start;
-  gap: 24px;
+  gap: 44px;
 }
 
 .hero-text-content {

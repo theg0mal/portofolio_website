@@ -87,6 +87,7 @@ a { color: inherit; text-decoration: none; }
 .tabs {
   list-style: none;
   display: flex;
+  justify-content: center;
   position: relative;
   margin: 0;
   padding: 0;
@@ -418,7 +419,7 @@ a { color: inherit; text-decoration: none; }
 
 .hero-socials {
   flex-shrink: 0;
-  margin-top: 90px;
+  margin-top: 95px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -458,7 +459,7 @@ a { color: inherit; text-decoration: none; }
 .scroll-cue {
   position: absolute;
   left: 24px;
-  bottom: 28px;
+  bottom: -28px;
   display: flex;
   align-items: center;
   gap: 10px;

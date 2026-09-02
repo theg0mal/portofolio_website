@@ -296,13 +296,37 @@ document.querySelectorAll('.project-card').forEach((card) => {
   const flipInner = document.getElementById('flipCardInner');
   if (!flipInner) return;
 
-  function toggleFlip() {
+  const flipCard = flipInner.closest('.flip-card');
+  let flipTimeout = null;
+
+  function setOrigin(x, y) {
+    const rect = flipInner.getBoundingClientRect();
+    const px = ((x - rect.left) / rect.width) * 100;
+    const py = ((y - rect.top) / rect.height) * 100;
+    flipInner.style.setProperty('--clip-x', `${px}%`);
+    flipInner.style.setProperty('--clip-y', `${py}%`);
+  }
+
+  function toggleFlip(originEvent) {
+    if (originEvent && originEvent.clientX != null) {
+      setOrigin(originEvent.clientX, originEvent.clientY);
+    } else {
+      flipInner.style.setProperty('--clip-x', '50%');
+      flipInner.style.setProperty('--clip-y', '50%');
+    }
+
     const flipped = flipInner.classList.toggle('flipped');
     flipInner.setAttribute('aria-pressed', String(flipped));
+
+    if (flipCard) flipCard.classList.add('is-flipping');
+    clearTimeout(flipTimeout);
+    flipTimeout = setTimeout(() => {
+      if (flipCard) flipCard.classList.remove('is-flipping');
+    }, 1350);
   }
 
   flipInner.setAttribute('aria-pressed', 'false');
-  flipInner.addEventListener('click', toggleFlip);
+  flipInner.addEventListener('click', (e) => toggleFlip(e));
   flipInner.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -310,24 +334,3 @@ document.querySelectorAll('.project-card').forEach((card) => {
     }
   });
 })();
-
-if (!prefersReducedMotion && window.matchMedia('(hover: hover)').matches) {
-  document.querySelectorAll('.project-card').forEach((card) => {
-    const maxTilt = 6; // degrees
-
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const px = (e.clientX - rect.left) / rect.width;  // 0 → 1
-      const py = (e.clientY - rect.top) / rect.height;  // 0 → 1
-      const ry = (px - 0.5) * maxTilt * 2;
-      const rx = (0.5 - py) * maxTilt * 2;
-      card.style.setProperty('--rx', `${rx}deg`);
-      card.style.setProperty('--ry', `${ry}deg`);
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.style.setProperty('--rx', '0deg');
-      card.style.setProperty('--ry', '0deg');
-    });
-  });
-}

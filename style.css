@@ -304,19 +304,37 @@ a { color: inherit; text-decoration: none; }
 .flip-card {
   position: relative;
   z-index: 1;
-  perspective: 1600px;
+}
+
+.flip-card::before {
+  content: "";
+  position: absolute;
+  inset: -16px;
+  z-index: -1;
+  border-radius: calc(var(--radius) + 16px);
+  background: linear-gradient(135deg, var(--accent-grad-1), var(--accent-grad-2));
+  filter: blur(22px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.flip-card.is-flipping::before {
+  animation: flipGlowPulse 1.3s ease;
+}
+
+@keyframes flipGlowPulse {
+  0%   { opacity: 0; }
+  30%  { opacity: 0.6; }
+  70%  { opacity: 0.6; }
+  100% { opacity: 0; }
 }
 
 .flip-card-inner {
   position: relative;
   cursor: pointer;
-  transform-style: preserve-3d;
-  transition: transform 1.1s cubic-bezier(.34,1.56,.64,1);
   aspect-ratio: 4 / 3.1;
-}
-
-.flip-card-inner.flipped {
-  transform: rotateY(900deg);
+  --clip-x: 50%;
+  --clip-y: 50%;
 }
 
 .flip-face {
@@ -324,8 +342,6 @@ a { color: inherit; text-decoration: none; }
   inset: 0;
   width: 100%;
   height: 100%;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
   border-radius: var(--radius);
 }
 
@@ -339,10 +355,16 @@ a { color: inherit; text-decoration: none; }
 }
 
 .flip-back {
-  transform: rotateY(180deg);
+  z-index: 2;
   overflow: hidden;
   border: 4px solid var(--bg);
   box-shadow: 0 20px 50px -20px rgba(0,0,0,0.5);
+  clip-path: circle(0% at var(--clip-x) var(--clip-y));
+  transition: clip-path 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.flip-card-inner.flipped .flip-back {
+  clip-path: circle(150% at var(--clip-x) var(--clip-y));
 }
 
 .flip-back img {

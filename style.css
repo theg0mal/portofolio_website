@@ -331,7 +331,6 @@ a { color: inherit; text-decoration: none; }
 
 .flip-card-inner {
   position: relative;
-  cursor: pointer;
   aspect-ratio: 4 / 3.1;
   --clip-x: 50%;
   --clip-y: 50%;

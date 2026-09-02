@@ -297,40 +297,32 @@ document.querySelectorAll('.project-card').forEach((card) => {
   if (!flipInner) return;
 
   const flipCard = flipInner.closest('.flip-card');
-  let flipTimeout = null;
 
-  function setOrigin(x, y) {
-    const rect = flipInner.getBoundingClientRect();
-    const px = ((x - rect.left) / rect.width) * 100;
-    const py = ((y - rect.top) / rect.height) * 100;
-    flipInner.style.setProperty('--clip-x', `${px}%`);
-    flipInner.style.setProperty('--clip-y', `${py}%`);
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return; // keep the static code view, no auto-cycling motion
   }
 
-  function toggleFlip(originEvent) {
-    if (originEvent && originEvent.clientX != null) {
-      setOrigin(originEvent.clientX, originEvent.clientY);
-    } else {
-      flipInner.style.setProperty('--clip-x', '50%');
-      flipInner.style.setProperty('--clip-y', '50%');
-    }
+  // Always reveal from the center since there's no click point anymore
+  flipInner.style.setProperty('--clip-x', '50%');
+  flipInner.style.setProperty('--clip-y', '50%');
 
-    const flipped = flipInner.classList.toggle('flipped');
-    flipInner.setAttribute('aria-pressed', String(flipped));
+  const SHOW_CODE_MS = 6000;
+  const SHOW_PHOTO_MS = 4000;
+  const GLOW_MS = 1350; // slightly longer than the 1.2s reveal transition
 
-    if (flipCard) flipCard.classList.add('is-flipping');
-    clearTimeout(flipTimeout);
-    flipTimeout = setTimeout(() => {
-      if (flipCard) flipCard.classList.remove('is-flipping');
-    }, 1350);
+  function pulseGlow() {
+    if (!flipCard) return;
+    flipCard.classList.add('is-flipping');
+    setTimeout(() => flipCard.classList.remove('is-flipping'), GLOW_MS);
   }
 
-  flipInner.setAttribute('aria-pressed', 'false');
-  flipInner.addEventListener('click', (e) => toggleFlip(e));
-  flipInner.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      toggleFlip();
-    }
-  });
+  function cycle() {
+    if (document.hidden) { setTimeout(cycle, 500); return; } // pause while tab is hidden
+
+    const showingPhoto = flipInner.classList.toggle('flipped');
+    pulseGlow();
+    setTimeout(cycle, showingPhoto ? SHOW_PHOTO_MS : SHOW_CODE_MS);
+  }
+
+  setTimeout(cycle, SHOW_CODE_MS);
 })();

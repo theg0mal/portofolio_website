@@ -356,6 +356,7 @@ a { color: inherit; text-decoration: none; }
 .flip-back {
   z-index: 2;
   overflow: hidden;
+  background: var(--code-bg);
   border: 4px solid var(--bg);
   box-shadow: 0 20px 50px -20px rgba(0,0,0,0.5);
   clip-path: circle(0% at var(--clip-x) var(--clip-y));
@@ -372,6 +373,7 @@ a { color: inherit; text-decoration: none; }
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 20%;
   display: block;
 }
 
